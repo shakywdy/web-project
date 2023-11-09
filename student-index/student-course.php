@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-03 02:29:18
+ * @LastEditTime: 2023-11-04 02:28:48
  * @FilePath: /web-project/student-index/student-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -120,7 +120,7 @@ if (isset($_SESSION['user_id'])) {
               <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
               </svg> 
-               <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\')" multiple>
+               <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\',\''.$crRow['courseid'].'\')" multiple>
               </button>
                <!-- this is check area  -->
                <div class="work-area">
@@ -630,9 +630,12 @@ function delnot(userid,id,time){
   });
 }
 function goto(sectionId) {
-    var section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
+  var nowpage = document.getElementById(currentpage);
+  var section = nowpage.querySelector("#" + sectionId.replace(/\s/g, "\\ "));
+
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+
   }
+}
 </script>

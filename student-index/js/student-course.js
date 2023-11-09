@@ -23,7 +23,8 @@ function submitwork(userid, courseid, header,keyid,studentname) {
   var studentfile = headerfile.querySelector("#file");
   var filearea = headerfile.querySelector("#work-area-file");
   var requestsCompleted = 0;
-  selectedFiles.forEach(function(file) {
+  var fileid=courseid+header;
+  selectedFiles[fileid].forEach(function(file) {
     var formData = new FormData();
     formData.append('file', file);
 
@@ -41,10 +42,10 @@ function submitwork(userid, courseid, header,keyid,studentname) {
       success: function(response) {
 
         requestsCompleted++;
-        if (requestsCompleted === selectedFiles.length) {
+        if (requestsCompleted === selectedFiles[fileid].length) {
             var formData=new FormData();
-        for (var i=0;i < selectedFiles.length;i++) {
-            var file=selectedFiles[i];
+        for (var i=0;i < selectedFiles[fileid].length;i++) {
+            var file=selectedFiles[fileid][i];
             formData.append('files[]', file, file.name);
         }
         
@@ -56,8 +57,7 @@ function submitwork(userid, courseid, header,keyid,studentname) {
         xhr.onload=function() {
             if (xhr.status===200) {
       
-                  studentfile.value="";  
-                  selectedFiles=[]
+                  selectedFiles[fileid]=[]
                   $(nowpage).load(location.href + ' #' + nowpage.id + ' > *', function() {
                     var remoteContent = $(nowpage).html();
                     $(nowpage).html(remoteContent);
@@ -96,15 +96,22 @@ function submitwork(userid, courseid, header,keyid,studentname) {
 
 
 
-function addwork(header) {
-  var nowpage =document.getElementById(currentpage);
+function addwork(header,courseid) {
+  var nowpage = document.getElementById(currentpage);
   var escapedHeader = header.replace(/\s/g, '\\$&');
   var headerfile = nowpage.querySelector('#' + escapedHeader);
   var studentfile = headerfile.querySelector("#file");
   var filearea = headerfile.querySelector("#work-area-file");
+  
+  var addfiles = Array.from(studentfile.files);
+  var fileid=courseid+header;
+  if (!selectedFiles[fileid]) {
+    selectedFiles[fileid] = [];
+  }
 
-  var addfiles = Array.from(studentfile.files); 
-  selectedFiles = selectedFiles.concat(addfiles); 
+  selectedFiles[fileid] = selectedFiles[fileid].concat(addfiles);
+  
+
   for (var i = 0; i < addfiles.length; i++) {
     var file = addfiles[i];
     var reader = new FileReader();
@@ -129,8 +136,7 @@ function addwork(header) {
    duration: 0.3,
    });
   }
-  console.log("select:",selectedFiles);
-  console.log("student",studentfile.files);
+
 }
 
 function deleteFile(button, name) {

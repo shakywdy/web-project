@@ -38,19 +38,269 @@ function resetscore(area){
   showElement(workbutton);
   studentwork.style.display="none";
 }
+function changescore(stid,gradeid){
+  gradarea=document.getElementById(stid);
+  var input = gradarea.querySelector('input');
+  $.ajax({
+    url: "./score.php",
+    type: "POST",
+    data: {
+      gradeid: gradeid,
+      cgrade: input.value
+    },
+    success: function (response) {
+      $(gradarea).load(location.href + ' #' + gradarea.id + ' > *', function () {
+        var remoteContent = $(gradarea).html();
+        $(gradarea).html(remoteContent);
+        var success = gradarea.querySelector('.changeready');
+        showsuccess(success);
+      });
+    },
+  });
+}
+function hidesuccess(element) {
+  TweenMax.to(element, 0.3, { opacity: 0, display: 'none' });
+} 
+
+function showsuccess(element) {
+  TweenMax.fromTo(element, 0.3, { opacity: 0, display: 'none' }, { opacity: 1, display: 'flex' });
+  setTimeout(function () {
+    hidesuccess(element);
+  }, 1500);
+}
+
+function sumbitscore(stid,csid,crid,gradeid){
+  gradarea=document.getElementById(gradeid);
+  var input = gradarea.querySelector('input');
+
+  $.ajax({
+    url: "./score.php",
+    type: "POST",
+    data: {
+     stid:stid,
+     csid:csid,
+     crid:crid,
+     score:input.value
+    },
+    success: function(response) {
+      $(gradarea).load(location.href + ' #' + gradarea.id + ' > *', function () {
+        var remoteContent = $(gradarea).html();
+        $(gradarea).html(remoteContent);
+        var success = gradarea.querySelector('.changeready');
+        showsuccess(success);
+      });
+    },
+    error: function(xhr, status, error) {
+      console.log(error)
+    }
+  });
 
 
+}
 
+var classtype;
+function addtype(type) {
+  var button;
+  
+  if (type === "1") {
+    var nowpage = document.getElementById(currentpage);
+    button = nowpage.querySelector("#textwork");
+    area=nowpage.querySelector(".new-class-area")
+    date=nowpage.querySelector(".content-date-new")
+    sbbutton =nowpage.querySelector(".ready-bt-new")
+    area.style.display="flex";
+    area.scrollIntoView({ behavior: 'smooth' });
+    button.classList.add('active');
+    showElement(date);
+    showElement(sbbutton);
+    classtype=type;
+    var otherButton = nowpage.querySelector("#normalcs");
+    if (otherButton.classList.contains('active')) {
+      otherButton.classList.remove('active');
+    }
+  } else {
+    var nowpage = document.getElementById(currentpage);
+    button = nowpage.querySelector("#normalcs");
+    button.classList.add('active');
+    area=nowpage.querySelector(".new-class-area")
+    date=nowpage.querySelector(".content-date-new")
+    sbbutton =nowpage.querySelector(".ready-bt-new")
+    classtype=type;
+    area.style.display="flex";
+    area.scrollIntoView({ behavior: 'smooth' });
+    hideElement(date);
+    showElement(sbbutton);
+    var otherButton = nowpage.querySelector("#textwork");
+    if (otherButton.classList.contains('active')) {
+      otherButton.classList.remove('active');
+    }
+  }
+  console.log(classtype)
+}
+function resetnew(header,courseid){
+  var nowpage = document.getElementById(currentpage);
+  var buttonwk = nowpage.querySelector("#textwork");
+  var buttoncs = nowpage.querySelector("#normalcs");
+  var area = nowpage.querySelector("#createnew");
+  var clasarea=area.querySelector(".new-class-area")
+  var date=area.querySelector(".content-date-new")
+  var sbbutton =area.querySelector(".ready-bt-new")
+  var titleinput =area.querySelector(".input-header");
+  var contentinput =area.querySelector(".textarea-content");
+  var dateinput =area.querySelector(".date-input");
 
-function addwork(header) {
+  var filearea = area.querySelector("#work-area-file");
+  fileid=courseid+header;
+  if(selectedFiles[fileid]){
+    selectedFiles[fileid]='';
+  }
+  filearea.innerHTML = '';
+
+  dateinput.value="";
+  titleinput.value="";
+  contentinput.value="";
+  sbbutton.style.display="none";
+  date.style.display="none";
+  clasarea.style.display="none";
+  area.style.display="none";
+  if (buttonwk.classList.contains('active')) {
+    buttonwk.classList.remove('active');
+  }
+  if (buttoncs.classList.contains('active')) {
+    buttoncs.classList.remove('active');
+  }
+  
+}
+function creat(courseid) {
+  var nowpage = document.getElementById(currentpage);
+  var area = nowpage.querySelector("#createnew");
+  var titleinput = area.querySelector(".input-header");
+  var contentinput = area.querySelector(".textarea-content");
+  var dateinput = area.querySelector(".date-input");
+  var type = classtype;
+  var fileid = courseid + "createnew";
+
+  
+  var requestData = {
+    courseid: courseid,
+    newtype: type,
+    newheader: titleinput.value,
+    newcontent: contentinput.value
+  };
+  
+  if (dateinput) {
+    requestData.newdate = dateinput.value;
+  }
+
+  $.ajax({
+    url:"./create.php",
+    type: "POST",
+    data: requestData,
+    success: function(response) {
+      if(selectedFiles[fileid]&& selectedFiles[fileid].length > 0){
+        submitnewwork("createnew", courseid,response,requestData.newheader);
+      }
+    else{
+      $(nowpage).load(location.href + ' #' + nowpage.id + ' > *', function () {
+        var remoteContent = $(nowpage).html();
+        $(nowpage).html(remoteContent);
+      });
+    }
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+function submitnewwork(area,courseid,id,header) {
+  console.log(area,courseid,id,header)
+  var nowpage =document.getElementById(currentpage);
+  var escapedHeader = area.replace(/\s/g, '\\$&');
+  var headerfile = nowpage.querySelector('#' + escapedHeader);
+  var filearea = headerfile.querySelector("#work-area-file");
+  var requestsCompleted = 0;
+  fileid=courseid+area;
+
+  selectedFiles[fileid].forEach(function(file) {
+    var formData = new FormData();
+    formData.append('file', file);
+
+    $.ajax({
+      url: './open.php',
+      type: 'POST',
+      data: {
+        filename: file.name,
+        courseid: courseid,
+        area: header,
+        id:id
+      },
+      success: function(response) {
+        
+
+        requestsCompleted++;
+        if (requestsCompleted === selectedFiles[fileid].length) {
+            var formData=new FormData();
+        for (var i=0;i < selectedFiles[fileid].length;i++) {
+            var file=selectedFiles[fileid][i];
+            formData.append('files[]', file, file.name);
+        }
+        
+        var xhr=new XMLHttpRequest();
+        xhr.open('POST', 'open.php', true);
+        formData.append('courseid', courseid);
+        formData.append('header',header)
+        xhr.onload=function() {
+            if (xhr.status===200) {
+                  console.log("ok");
+
+                  selectedFiles[fileid]=[]
+                  location.reload();
+                      //animation
+                  gsap.to(filearea, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: function() {
+                      filearea.innerHTML = '';
+                      gsap.to(filearea, {
+                        opacity: 1,
+                        duration: 0.3
+                      });
+                    }
+                  }); 
+                      
+            }
+            else {
+                console.log("error");
+            }
+        };
+        xhr.send(formData);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log(error);
+        requestsCompleted++;
+        if (requestsCompleted === selectedFiles.length) {
+    
+        }
+      }
+    });
+  });
+}
+function addwork(header,courseid) {
   var nowpage =document.getElementById(currentpage);
   var escapedHeader = header.replace(/\s/g, '\\$&');
   var headerfile = nowpage.querySelector('#' + escapedHeader);
   var studentfile = headerfile.querySelector("#file");
   var filearea = headerfile.querySelector("#work-area-file");
+  fileid=courseid+header;
+ var addfiles = Array.from(studentfile.files);
 
-  var addfiles = Array.from(studentfile.files); 
-  selectedFiles = selectedFiles.concat(addfiles); 
+  if (!selectedFiles[fileid]) {
+    selectedFiles[fileid] = [];
+  }
+
+  selectedFiles[fileid] = selectedFiles[fileid].concat(addfiles);
+  console.log(selectedFiles);
   for (var i = 0; i < addfiles.length; i++) {
     var file = addfiles[i];
     var reader = new FileReader();
@@ -92,6 +342,13 @@ function delfileonlink(id, area) {
   hideElement(link);
 }
 function sumbitchange(area,courseid,id) {
+  var nowpage =document.getElementById(currentpage);
+  var escapedHeader = area.replace(/\s/g, '\\$&');
+  var headerfile = nowpage.querySelector('#' + escapedHeader);
+  var header = headerfile.querySelector('.input-header');
+  var content = headerfile.querySelector('.textarea-content');
+  var inputdate = headerfile.querySelector('.date-input');
+
   //file
   if (deletelink.hasOwnProperty(area) && Object.keys(deletelink[area]).length !== 0) {
     var data = deletelink[area];
@@ -100,27 +357,36 @@ function sumbitchange(area,courseid,id) {
     });
   }
   // update file
+  fileid=courseid+area;
+  console.log(fileid);
+  console.log(selectedFiles[fileid]);
+  if(selectedFiles[fileid]&& selectedFiles[fileid].length > 0){
   submitwork(area,courseid,id);
-  //change input
-  var escapedHeader = area.replace(/\s/g, '\\$&');
-  var headerfile = document.querySelector('#' + escapedHeader);
-  var header = headerfile.querySelector('.input-header');
-  var content = headerfile.querySelector('.textarea-content');
-  var inputdate = headerfile.querySelector('.date-input');
-  if(inputdate){
-    console.log(inputdate.value);
   }
-  changeupdate(id,header.value,content.value)
+  //change input
+  if (inputdate) {
+    changeupdate(id, header.value, content.value, inputdate.value);
+  } else {
+    changeupdate(id, header.value, content.value);
+  }
+
 }
-function changeupdate(dbcid,courseheader,coursecontent){
+function changeupdate(dbcid, courseheader, coursecontent, date) {
+  var nowpage = document.getElementById(currentpage);
+  var requestData = {
+    dbcid: dbcid,
+    courseheader: courseheader,
+    coursecontent: coursecontent
+  };
+
+  if (date) {
+    requestData.date = date;
+  }
+
   $.ajax({
     url: "./open.php",
     type: "POST",
-    data: {
-       dbcid:dbcid,
-       courseheader:courseheader,
-       coursecontent:coursecontent
-    },
+    data: requestData,
     success: function(response) {
       $(nowpage).load(location.href + ' #' + nowpage.id + ' > *', function() {
         var remoteContent = $(nowpage).html();
@@ -128,19 +394,21 @@ function changeupdate(dbcid,courseheader,coursecontent){
       });
     },
     error: function(xhr, status, error) {
-      console.log(error)
+      console.log(error);
     }
   });
 }
 
-function submitwork(area, courseid,id) {
+
+function submitwork(area,courseid,id) {
   var nowpage =document.getElementById(currentpage);
   var escapedHeader = area.replace(/\s/g, '\\$&');
   var headerfile = nowpage.querySelector('#' + escapedHeader);
-  var studentfile = headerfile.querySelector("#file");
   var filearea = headerfile.querySelector("#work-area-file");
   var requestsCompleted = 0;
-  selectedFiles.forEach(function(file) {
+  fileid=courseid+area;
+
+  selectedFiles[fileid].forEach(function(file) {
     var formData = new FormData();
     formData.append('file', file);
 
@@ -154,12 +422,13 @@ function submitwork(area, courseid,id) {
         id:id
       },
       success: function(response) {
+        
 
         requestsCompleted++;
-        if (requestsCompleted === selectedFiles.length) {
+        if (requestsCompleted === selectedFiles[fileid].length) {
             var formData=new FormData();
-        for (var i=0;i < selectedFiles.length;i++) {
-            var file=selectedFiles[i];
+        for (var i=0;i < selectedFiles[fileid].length;i++) {
+            var file=selectedFiles[fileid][i];
             formData.append('files[]', file, file.name);
         }
         
@@ -169,9 +438,9 @@ function submitwork(area, courseid,id) {
         formData.append('header',area)
         xhr.onload=function() {
             if (xhr.status===200) {
-      
-                  studentfile.value="";  
-                  selectedFiles=[]
+                  console.log("ok");
+
+                  selectedFiles[fileid]=[]
                   $(nowpage).load(location.href + ' #' + nowpage.id + ' > *', function() {
                     var remoteContent = $(nowpage).html();
                     $(nowpage).html(remoteContent);
@@ -228,9 +497,10 @@ function delsavefile(dateid) {
   });
 }
 
-function reset(area) {
+function reset(courseid,area) {
+  var nowpage =document.getElementById(currentpage);
   var escapedHeader = area.replace(/\s/g, '\\$&');
-  var headerfile = document.querySelector('#' + escapedHeader);
+  var headerfile = nowpage.querySelector('#' + escapedHeader);
   var header = headerfile.querySelector('.input-header');
   var content = headerfile.querySelector('.textarea-content');
   var date = headerfile.querySelector('.date-input');
@@ -239,7 +509,13 @@ function reset(area) {
   var submitArea = headerfile.querySelector('.submit-area');
   var link =headerfile.querySelectorAll('.left-course-class-content-link');
   var linkbutton =headerfile.querySelectorAll('.left-course-class-content-link button');
+  fileid=courseid+header;
+  var filearea = headerfile.querySelector("#work-area-file");
 
+  if(selectedFiles[fileid]){
+    selectedFiles[fileid]='';
+  }
+  filearea.innerHTML = '';
 
   replaceElement(header, createSpan(oldElement[area].oldheader));
   replaceElement(content, createSpan(oldElement[area].oldcontent));
@@ -264,8 +540,9 @@ function createSpan(text) {
 }
 
 function convertToInput(area) {
+  var nowpage =document.getElementById(currentpage);
   var escapedHeader = area.replace(/\s/g, '\\$&');
-  var headerfile = document.querySelector('#' + escapedHeader);
+  var headerfile = nowpage.querySelector('#' + escapedHeader);
   var header = headerfile.querySelector('.left-course-class-header span');
   var content = headerfile.querySelector('.left-course-class-content span');
   var editButton = headerfile.querySelector('#editButton');
@@ -281,7 +558,7 @@ function convertToInput(area) {
   showElement(linkbutton);
   showElement(submitArea);
   if (date) {
-    replaceElement(date, createInput('date-input', 'date', getCurrentDate()));
+    replaceElement(date, createInput('date-input', 'date', date.value));
   }
 
   oldElement = {

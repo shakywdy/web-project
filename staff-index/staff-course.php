@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-03 13:02:56
+ * @LastEditTime: 2023-11-05 23:10:10
  * @FilePath: /web-project/staff-index/staff-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -15,10 +15,11 @@ if (isset($_SESSION['user_id'])) {
         var userid = ' . $userid . ';
     </script>';
     $db = loadingdb();
-    $sql = "SELECT courseid FROM course WHERE staffid = $userid";
+    $sql = "SELECT DISTINCT courseid FROM course WHERE staffid = $userid";
     $result = mysqli_query($db, $sql);
     $coursebutton = '';
     $counter = 0;
+
 
     while ($row = mysqli_fetch_assoc($result)) {
         $counter++;
@@ -76,7 +77,7 @@ if (isset($_SESSION['user_id'])) {
           <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
           </svg> 
-           <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\')" multiple>
+          <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\',\''.$crRow['courseid'].'\')" multiple>
           </button>
            <!-- this is check area  -->
            <div class="work-area">
@@ -91,7 +92,7 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- button-area-->
         <div class="edit-button-area">
-        <button class="chancel-bt" id="chancel-bt" onclick="reset(\''.$crheader .'\')"> Chancel </button>  <button class="ready-bt" onclick="sumbitchange(\''.$crheader .'\', \''.$crcourseid .'\',\''.$crRow['id'].'\')" id="ready-bt">Sumbit </button>  
+        <button class="chancel-bt" id="chancel-bt" onclick="reset(\''.$courseid .'\',\''.$crheader .'\')"> Chancel </button>  <button class="ready-bt" onclick="sumbitchange(\''.$crheader .'\', \''.$crcourseid .'\',\''.$crRow['id'].'\')" id="ready-bt">Sumbit </button> 
         </div>
         <!-- button-area end-->
         </div>';
@@ -102,34 +103,15 @@ if (isset($_SESSION['user_id'])) {
             $has=0;
             $homeworkbt='';
             $studenthasworkhtml='';
+            $studentNames = [];
             while($stwrow= mysqli_fetch_assoc($studentworkrs)){
-              
-              $prevStudentName = null;
-              $studentNames = array();
-              while ($stwrow = mysqli_fetch_assoc($studentworkrs)) {
-              $studentName = $stwrow['studentid'];             
+              $studentName = $stwrow['studentid'];                                 
               if (!in_array($studentName, $studentNames)) {
                 $has++;
+                $studentNames[] = $studentName;  
                 $checkgrade = "SELECT * FROM grade WHERE studentid='$studentName' AND header ='$crid'";
                 $graderesule =mysqli_query($db,$checkgrade);
                 $grade='';
-                //find student grade
-                if(mysqli_num_rows($graderesule) > 0) { 
-                $row=mysqli_fetch_assoc($graderesule);
-                $score=$row['score'];
-                $grade='
-                <div class="scoring-grade">
-                <div class="scoring-grade-top"><div>Score:</div><input value="'.$score.'"></input></div>
-                <button  class="scoring-grade-button-c">Modify</button>
-                </div>';
-                }
-                else{                       
-                 $grade='
-                 <div class="scoring-grade">
-                 <div class="scoring-grade-top"><div>Unrated</div><input></input></div>
-                 <button class="scoring-grade-button">Submit</button>
-                 </div>';
-                }
                 //find student file
                 $stfilelink='';
                 $studentsfile="SELECT * FROM submit WHERE studentid='$studentName'";
@@ -145,8 +127,41 @@ if (isset($_SESSION['user_id'])) {
                 <div class="sfc-date">'.$stfrow['date'].' </div>
                 </div>
                ';
-               }
-                // output html
+               }                
+               //find student grade
+               if(mysqli_num_rows($graderesule) > 0) { 
+                $row=mysqli_fetch_assoc($graderesule);
+                $score=$row['score'];
+                $id=$row['id'];
+                $grade='
+                <div class="scoring-grade" id="'.$courseid.''.$crid.''.$studentName .'">
+                <div class="scoring-grade-top">
+                <div class="scoring-grade-top-div">
+                <div class="top-score-header">Score:</div>
+                <input value="'.$score.'">
+                </input>
+                </div>
+                <button onclick="changescore(\''.$courseid.''.$crid.''.$studentName .'\',\''.$id.'\')" class="scoring-grade-button-c">Modify</button>
+                </div>
+                <div class="changeready">
+                <div class="changeready-div">Success!</div>
+                </div>
+                </div>';
+                }
+                else{                        
+                 $grade='
+                 <div class="scoring-grade" id="'.$courseid.''.$crid.''.$studentName .'">
+                 <div class="scoring-grade-top">
+                 <div class="scoring-grade-top-div">
+                 <div class="top-score-header">Unrated</div>
+                 <input></input></div>
+                 <button onclick="sumbitscore(\''.$studentName.'\',\''.$courseid.'\',\''.$crid.'\',\''.$courseid.''.$crid.''.$studentName .'\')" class="scoring-grade-button">Submit</button>
+                 </div>
+                 <div class="changeready">
+                 <div class="changeready-div">Success!</div>
+                 </div>
+                 </div>';
+                }                
                 $studenthasworkhtml .='
                 <div class="scoring">
                 <div class="scoring-info">
@@ -154,18 +169,20 @@ if (isset($_SESSION['user_id'])) {
                 <div class="scoring-info-div b">Student id:'.$studentName .'</div>
                 </div>
                 <div class="scoring-file">
-  
                 '.$stfilelink.'
-  
                 </div>
                 <!-- this grade area  -->
                 '.$grade .'
                 <!-- this grade area end  -->
-                 </div>      
+                 </div>    
                 ';
-              $studentNames[] = $studentName;
-               }
               }  
+ 
+
+                // output html
+
+               
+
             }         
 
             if($has>0){
@@ -219,7 +236,7 @@ if (isset($_SESSION['user_id'])) {
              <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
              </svg> 
-              <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\')" multiple>
+              <input type="file" id="file" oninput="addwork(\''.$crRow['header'].'\',\''.$crRow['courseid'].'\')" multiple>
              </button>
               <!-- this is check area  -->
               <div class="work-area">
@@ -234,14 +251,60 @@ if (isset($_SESSION['user_id'])) {
 
             <!-- button-area-->
             <div class="edit-button-area">
-            <button class="chancel-bt" id="chancel-bt" onclick="reset(\''.$crheader .'\')"> Chancel </button>  <button class="ready-bt" onclick="sumbitchange(\''.$crheader .'\', \''.$crcourseid .'\',\''.$crRow['id'].'\')" id="ready-bt">Sumbit </button>  
+            <button class="chancel-bt" id="chancel-bt" onclick="reset(\''.$courseid .'\',\''.$crheader .'\')"> Chancel </button>  <button class="ready-bt" onclick="sumbitchange(\''.$crheader .'\', \''.$crcourseid .'\',\''.$crRow['id'].'\')" id="ready-bt">Sumbit </button>  
             </div>
          <!-- button-area  end-->    
             </div>' ;
         }
 
     }
-        $coursecontent .= '<div class="left-course" onscroll="showNav()" id="'.$dateid.'"><div class="nav-area" id="navarea"><button class="addevent-button">+</button>'. $navbutton .'</div>'.$work.'        <div class="left-course-class"></div></div>';
+    $newclass='    <div class="left-course-class-new" id="createnew">
+    <div class="left-course-bt-area"><button onclick="addtype(\'0\')" class="bt-area-bt" id="normalcs">Class</button><button onclick="addtype(\'1\')" class="bt-area-bt" id="textwork">Test/Work</button></div>
+    <div class="new-class-area">
+    <div class="left-course-class-header">
+    <input class="input-header"></input>
+    </div>
+    <div class="left-course-class-content">
+    <textarea class="textarea-content"></textarea>
+    <div class="content-date-new">
+    <input type=date class="date-input"></input>
+    </div>
+    <div class="submit-area-new">
+    <!-- <input type="file"> -->
+     <div class="submit-area-header">
+      Upload your file
+     </div>
+       <div class="file-area">
+       <button class="file-sumbit" >   
+       <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+       <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+       </svg> 
+       <input type="file" id="file" oninput="addwork(\'createnew\',\''.$courseid.'\')" multiple>
+       </button>
+        <!-- this is check area  -->
+        <div class="work-area">
+          <div class="work-area-file" id="work-area-file">
+         <!-- this is your add file-->
+          </div>     
+        </div>
+       </div>
+     </div>  
+    </div>
+    <!-- ??   -->
+    </div>
+    <div class="edit-button-area-new">
+    <button class="chancel-bt" id="chancel-bt" onclick="resetnew(\'createnew\',\''.$courseid.'\')"> Chancel </button>  <button class="ready-bt-new" onclick="creat(\''.$courseid.'\')" id="ready-bt">Sumbit </button>  
+    </div>
+    </div>';
+
+    $coursecontent .= '<div class="left-course" onscroll="showNav()" id="'.$dateid.'">
+    <div class="nav-area" id="navarea">
+      <button class="addevent-button" onclick="goto(\'createnew\')">+</button>
+      '.$navbutton.'
+    </div>
+    '.$work.'
+   '.$newclass .'
+  </div>';
     }
 
 
@@ -251,9 +314,10 @@ if (isset($_SESSION['user_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Course</title>
     <link rel="stylesheet" type="text/css" href="css/staff-course.css">
 </head>
 <body>
@@ -325,14 +389,13 @@ if (isset($_SESSION['user_id'])) {
        $stresule = mysqli_query($db, $studentdue);
        while ($row = mysqli_fetch_assoc($stresule)) {
         $dueDates[] = $row;
-
        }
       //  search course due date 
-       $sqlcourse = "SELECT courseid FROM course WHERE staffid = $userid";
+       $sqlcourse = "SELECT DISTINCT  courseid FROM course WHERE staffid = $userid";
        $result = mysqli_query($db, $sqlcourse);
        while ($row = mysqli_fetch_assoc($result)) {
          $courseiddate = $row['courseid'];
-         $due = "SELECT * FROM duedate WHERE tittle = '$courseiddate'";
+         $due = "SELECT * FROM duedate WHERE userid = '$courseiddate'";
          $dueresult = mysqli_query($db, $due);
      
          while ($duedateRow = mysqli_fetch_assoc($dueresult)) {
@@ -396,7 +459,7 @@ if (isset($_SESSION['user_id'])) {
 
 var duedates=[];
 duedates= <?php echo json_encode($eventdate); ?>;
-
+console.log(duedates);
 class Calendar {
   constructor({
     element,
@@ -710,9 +773,16 @@ function delnot(userid,id,time){
   });
 }
 function goto(sectionId) {
-    var section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+  var nowpage = document.getElementById(currentpage);
+  var section = nowpage.querySelector("#" + sectionId.replace(/\s/g, "\\ "));
+
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+    if (section.id === 'createnew') {
+      section.style.display = "flex";
     }
   }
+}
+
+
 </script>

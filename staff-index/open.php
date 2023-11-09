@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-29 23:45:19
- * @LastEditTime: 2023-11-02 17:46:40
+ * @LastEditTime: 2023-11-06 21:22:44
  * @FilePath: /web-project/staff-index/open.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -66,18 +66,41 @@ if(isset($_POST['filename'])&& isset($_POST['courseid'])&& isset($_POST['area'])
     mysqli_close($db);
 }
 
-if(isset($_POST['dbcid'])&& isset($_POST['courseheader'])&& isset($_POST['coursecontent'])){
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "mydatabase";
-    $dbcid =$_POST['dbcid'];
-    $courseheader= $_POST['courseheader'];
-    $coursecontent = $_POST['coursecontent'];
-    $db = mysqli_connect($servername, $username, $password, $dbname);
+if (isset($_POST['dbcid']) && isset($_POST['courseheader']) && isset($_POST['coursecontent'])) {
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "mydatabase";
+  $dbcid = $_POST['dbcid'];
+  $courseheader = $_POST['courseheader'];
+  $coursecontent = $_POST['coursecontent'];
+
+  $db = mysqli_connect($servername, $username, $password, $dbname);
+  // 添加对 date 参数的接收
+  if (isset($_POST['date'])) {
+      $date = $_POST['date'];
+      $sql = "UPDATE coursework SET header='$courseheader', content='$coursecontent',date='$date' WHERE id='$dbcid'";
+  }
+  else{
     $sql = "UPDATE coursework SET header='$courseheader', content='$coursecontent' WHERE id='$dbcid'";
-    $db->query($sql);
-    mysqli_close($db);
+  }
+
+  $db->query($sql);
+  mysqli_close($db);
+}
+if(isset($_POST["changeheader"])&& isset($_POST["changedate"])){
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "mydatabase";
+  $dbcid =$_POST['dbcid'];
+  $changeheader= $_POST['changeheader'];
+  $changedate = $_POST['changedate'];
+  $db = mysqli_connect($servername, $username, $password, $dbname);
+  $sql = "UPDATE coursework SET header='$courseheader', content='$coursecontent' WHERE id='$dbcid'";
+  $db->query($sql);
+  mysqli_close($db);
+
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

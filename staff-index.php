@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-09-26 23:45:57
- * @LastEditTime: 2023-11-01 23:07:37
+ * @LastEditTime: 2023-11-09 21:21:19
  * @FilePath: /web-project/staff-index.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -149,16 +149,15 @@ if (isset($_SESSION['user_id'])) {
       <img src="hsuhk.png" width="50" height="50">
      </div>
      <div class="left-content">
-        <button class="left-content-list">Home</button>
-        <button class="left-content-list">Friend</button>
-        <button class="left-content-list">Course</button>
+     <button class="left-content-list active" onclick="changeFrame('staff-index/staff-course.php')">Home</button>
+     <button class="left-content-list" onclick="changeFrame('staff-index/staff-read.php')">Friend</button>
      </div>
     </div> 
     </div>
     
 	 <div class="right">
       <div class="right-main" id="frame" >
-        <iframe src="staff-index/staff-course.php"></iframe>
+      <iframe id="iframe"src="staff-index/staff-course.php"></iframe>
       </div>
 
      </div> 
@@ -166,5 +165,28 @@ if (isset($_SESSION['user_id'])) {
 	</body>
   <script src="js/student-index.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script>
+    function changeFrame(src) {
+      var iframe = document.getElementById('iframe');
+      gsap.to(iframe, {
+        opacity: 0,
+        duration: 0.2,
+        onComplete: function() {
+          iframe.src = src;
+          gsap.to(iframe, { opacity: 1, duration: 0.2 });
+        }
+      });
+    }
+    var acitvebuttons = document.querySelectorAll('.left-content-list');
+acitvebuttons.forEach(function(button) {
+  button.addEventListener('click', function() {
+    acitvebuttons.forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    this.classList.add('active');
+  });
+});
+</script>
 </html>
 

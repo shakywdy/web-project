@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-09-26 23:45:57
- * @LastEditTime: 2023-11-02 20:23:17
+ * @LastEditTime: 2023-11-09 16:55:10
  * @FilePath: /web-project/student-index.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -151,16 +151,16 @@ if (isset($_SESSION['user_id'])) {
       <img src="hsuhk.png" width="50" height="50">
      </div>
      <div class="left-content">
-     <button class="left-content-list" onclick="changeFrame('student-index/student-home.php')">Home</button>
-     <button class="left-content-list" onclick="changeFrame('student-index/student-course.php')">Friend</button>
-     <button class="left-content-list">Course</button>
+     <button class="left-content-list active" onclick="changeFrame('student-index/student-home.php')">Home</button>
+     <button class="left-content-list" onclick="changeFrame('student-index/student-course.php')">Course</button>
+     <button class="left-content-list" onclick="changeFrame('student-index/grade.php')">Information</button>
     </div>
    </div>
    </div>
 
 <div class="right">
   <div class="right-main" id="frame">
-    <iframe id="iframe" src="student-index/student-course.php"></iframe>
+    <iframe id="iframe" src="student-index/grade.php"></iframe>
   </div>
 </div>
 
@@ -180,5 +180,14 @@ if (isset($_SESSION['user_id'])) {
         }
       });
     }
+var buttons = document.querySelectorAll('.left-content-list');
+buttons.forEach(function(button) {
+  button.addEventListener('click', function() {
+    buttons.forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    this.classList.add('active');
+  });
+});
 </script>
 </html>

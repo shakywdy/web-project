@@ -1,0 +1,248 @@
+* {
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+   height: 100vh;
+  }
+  .container{
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+.left{
+    width: 70%;
+    height: 97%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    background-color: #ffffff;
+    margin-left: 10px;
+    color: #333;
+    border-radius: 25px;
+    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.6);
+
+}
+.choice {
+    display: flex;
+    height: 5%;
+    width: 100%;
+    justify-content: center;
+}
+
+.choice button {
+    width: 15%;
+    height: 80%;
+    text-align: center;
+    font-size: 15px;
+    background-color: #fbfbfb;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+    transition: background-color 0.3s ease;
+}
+.choice button:hover {
+    background-color: #aeaeae;
+}
+.left-header{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 96%;
+    height: 50%;
+    background-color: #f1f3f4;
+    border-radius: 25px;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+
+
+.cloud{
+    width: 100%;
+    height: 100%;
+}
+.left-content{
+    margin-top: 10px;
+    display: flex;
+    width: 100%;
+    height: 40%;
+
+}
+.left-content-data {
+    height: 90%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.left-content-header {
+    width: 85%;
+    height: 10%;
+    color: #484747eb;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+}
+
+.left-score {
+    overflow-x: auto; 
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    height: 100%;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+.scorebox{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.outputscore {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+.course-div{
+ height: 90%;
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ flex-direction: column;
+}
+.course-area{
+    height: 80%;
+    width: 80%;
+    overflow: auto;
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+.course-gpa {
+    background-color: #ffd000;
+    color: #000000;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height: 20%;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.stid,
+.header,
+.courseid{
+    margin-bottom: 15px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+}
+.feedback{
+    width: 80%;
+    height: 80%;
+    border: none;
+    resize:none; 
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+   
+}
+.submit{
+    width: 80%;
+    height: 20%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border: none;
+    background-color: rgb(163, 254, 169);
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color ease 0.3s;
+}
+.submit:hover{
+    background-color: rgb(110, 177, 115);
+}
+
+.right{
+    display: flex;
+    flex-direction: column;
+    width: 28%;
+    height: 97%;
+    border-radius: 25px;
+    margin: auto;
+}
+
+.select{
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    height: 50%;
+}
+.feebackbox{
+    width: 50%;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-content{
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+}
+.piechat{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.6);
+}
+
+
+.coursescore {
+    display: flex;
+    height: 20%;
+    width: 80%;
+   margin-top: 10px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: #f1f3f4;
+    box-shadow: 0 0.0625em 0.0625em rgba(0, 0, 0, 0.25), 
+                0 0.125em 0.5em rgba(0, 0, 0, 0.25), 
+                0 0 0 1px inset rgba(255, 255, 255, 0.1);
+
+}
