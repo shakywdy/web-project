@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-05 23:10:10
+ * @LastEditTime: 2023-11-09 22:47:01
  * @FilePath: /web-project/staff-index/staff-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -114,7 +114,7 @@ if (isset($_SESSION['user_id'])) {
                 $grade='';
                 //find student file
                 $stfilelink='';
-                $studentsfile="SELECT * FROM submit WHERE studentid='$studentName'";
+                $studentsfile="SELECT * FROM submit WHERE studentid='$studentName'AND keyid ='$crid'";
                 $studentsfilere =mysqli_query($db,$studentsfile);
                 while($stfrow=mysqli_fetch_assoc($studentsfilere)){
                 $stfilelink .='
@@ -780,6 +780,7 @@ function goto(sectionId) {
     section.scrollIntoView({ behavior: 'smooth' });
     if (section.id === 'createnew') {
       section.style.display = "flex";
+      section.scrollIntoView({ behavior: 'smooth' });
     }
   }
 }

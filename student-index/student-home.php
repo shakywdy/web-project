@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-07 16:16:31
- * @LastEditTime: 2023-10-30 23:49:43
+ * @LastEditTime: 2023-11-10 01:34:31
  * @FilePath: /web-project/student-index/student-home.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -45,6 +45,7 @@ if (isset($_SESSION['user_id'])) {
   $fd ="SELECT friendid FROM friends WHERE studentid = '$user_id' ";
   $fdcount = mysqli_query($db, $fd);
   $fdcard = '';
+  $fddis='';
   while ($fdrow = mysqli_fetch_assoc($fdcount)) 
   {
     $frid = $fdrow['friendid'];
@@ -55,7 +56,7 @@ if (isset($_SESSION['user_id'])) {
     $pynm = $fddtrow['name'];
     $fdds = "SELECT id, date, name, content,type,filename,filetype,filesize,link FROM discussion WHERE id='$frid'";
     $fdstext = mysqli_query($db, $fdds);
-    $fddis='';
+
   while ($fdrow = mysqli_fetch_assoc($fdstext)) 
   {
     if($fdrow['type']== 0){

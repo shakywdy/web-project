@@ -25,33 +25,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $sql = "SELECT score, courseid FROM grade";
 $result = mysqli_query($db, $sql);
 
-$dictionary = array();
+if (mysqli_num_rows($result) > 0) {
+    $dictionary = array();
 
-while ($row = mysqli_fetch_assoc($result)) {
-    $courseid = $row['courseid'];
-    $score = $row['score'];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $courseid = $row['courseid'];
+        $score = $row['score'];
 
-    if (!isset($dictionary[$courseid])) {
-        $dictionary[$courseid] = array('A' => 0, 'B' => 0, 'C' => 0, 'D' => 0,'no grade'=>0);
+        if (!isset($dictionary[$courseid])) {
+            $dictionary[$courseid] = array('A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'no grade' => 0);
+        }
+
+        if ($score > 85) {
+            $dictionary[$courseid]['A'] += 1;
+        }
+        if ($score <= 84 && $score >= 66) {
+            $dictionary[$courseid]['B'] += 1;
+        }
+        if ($score <= 65 && $score > 56) {
+            $dictionary[$courseid]['C'] += 1;
+        }
+        if ($score <= 55 && $score >= 50) {
+            $dictionary[$courseid]['D'] += 1;
+        }
+        if ($score <= 49) {
+            $dictionary[$courseid]['no grade'] += 1;
+        }
     }
 
-    if ($score > 85) {
-        $dictionary[$courseid]['A'] += 1;
-    }
-    if ($score <= 84 && $score >= 66) {
-        $dictionary[$courseid]['B'] += 1;
-    }
-    if ($score <= 65 && $score > 56) {
-        $dictionary[$courseid]['C'] += 1;
-    }
-    if ($score <= 55 && $score >= 50) {
-        $dictionary[$courseid]['D'] += 1;
-    }
-    if ($score <= 49) {
-        $dictionary[$courseid]['no grade'] += 1;
-    }
-    
-}
+   
+} 
 $jsonDictionary = json_encode($dictionary);
 
 
@@ -63,6 +66,8 @@ $coursefeedback = $db->query($grade);
 
 $courselist = array();
 $feedbackbutton = '';
+if (mysqli_num_rows($coursefeedback) > 0) {
+
     while ($row = mysqli_fetch_assoc($coursefeedback)) {
         $crid = $row['courseid'];
         
@@ -83,58 +88,91 @@ $feedbackbutton = '';
     $courselist[$crid] = $feedbackList;
     }
     $jsonfeedback = json_encode($courselist[$crid]);
-
+}
+else{
+   
+}
     
 
 
 $courseQuery = "SELECT * FROM course WHERE studentid = $user_id";
 $result2 = $db->query($courseQuery);
     
-    while ($rows = mysqli_fetch_assoc($result2)) {
+while ($rows = mysqli_fetch_assoc($result2)) {
         $courseId = $rows['courseid'];
     
         $feedbackbutton .= '
             <button onclick="CallAll(\'' . $courseId . '\')">
                 ' . $courseId . '
             </button>';
-    }
+}
 
 
     
 $courseQuery = "SELECT * FROM course WHERE studentid = $user_id";
 $result2 = $db->query($courseQuery);
-$div = '';
+$div = '<div class="course-div">
+<div class="course-area">
+ <div class="area-none">none</div>
+</div>
+<div class="course-gpa"> GPA:none</div>
+</div>';
+$span='<span id="courseSpan"></span>';
 $courseGpas = array();
-
+if ($result2->num_rows > 0) {
+$span='<span id="courseSpan"></span>
+';
+$firstCourseId = '';
 while ($row = mysqli_fetch_assoc($result2)) {
     $crid = $row['courseid'];
+    if ($firstCourseId === '') {
+        $firstCourseId = $crid; 
+    }
     $gradeQuery1 = "SELECT * FROM grade WHERE courseid = '$crid' AND studentid = $user_id";
     $gradescore = $db->query($gradeQuery1);
     $gradediv = '';
     $total = 0;
     $numberscore = 0;
-
-    while ($rows = mysqli_fetch_assoc($gradescore)) {
-        $gradediv .= '<div class="coursescore">' . $rows['courseid'] . '&nbsp;&nbsp;&nbsp;' . $rows['header'] . '&nbsp;&nbsp;Score: ' . $rows['score'] . '</div>';
-
-        $total += $rows['score'];
-        $numberscore++;
+    
+    if (mysqli_num_rows($gradescore) > 0) {
+        while ($rows = mysqli_fetch_assoc($gradescore)) {
+            $gradediv .= '<div class="coursescore">' . $rows['courseid'] . '&nbsp;&nbsp;&nbsp;' . $rows['header'] . '&nbsp;&nbsp;Score: ' . $rows['score'] . '</div>';
+    
+            $total += $rows['score'];
+            $numberscore++;
+        }
+        $courseGpa = calculateGpa($total / $numberscore);
+        $courseGpas[$crid] = $courseGpa;
+        $div .= '
+        <div class="course-div" id="' . $row['courseid'] . '">
+        <div class="course-area">
+            ' . $gradediv . '
+        </div>
+        <div class="course-gpa"> GPA:'. $courseGpa . '</div>
+        </div>
+      '
+        ;
     }
-
-    $courseGpa = calculateGpa($total / $numberscore);
-    $courseGpas[$crid] = $courseGpa;
-
-    $div .= '
-    <div class="course-div" id="' . $row['courseid'] . '">
-    <div class="course-area">
-        ' . $gradediv . '
-    </div>
-    <div class="course-gpa"> GPA:'. $courseGpa . '</div>
-    </div>
-  '
-    ;
-
+    else{
+        $div .= '
+        <div class="course-div" id="' . $row['courseid'] . '">
+        <div class="course-area">
+         <div class="area-none">none</div>
+        </div>
+        <div class="course-gpa"> GPA:none</div>
+        </div>
+      '
+        ;
+    }
 }
+echo '<script>';
+echo 'var firstCourseId = "'. $firstCourseId .'";';
+echo '</script>';
+}
+
+  
+
+
 
 function calculateGpa($averageScore) {
     if ($averageScore >= 90) {
@@ -192,7 +230,7 @@ mysqli_close($db);
             </div>
             <div class="left-header">
                 <div class="cloud" id="cloud">
-
+          
                 </div>
 
             </div>
@@ -200,7 +238,7 @@ mysqli_close($db);
             <div class="left-content">
                 <div class="feebackbox">
                 <div class="left-content-header">
-                       Feedback 
+                       Feedback :<?php echo $span?>
                 </div>  
                 <div class="left-content-data" id="left-content-data">
                 <textarea type="text"  id="feedback" class="feedback"></textarea>
@@ -235,6 +273,16 @@ mysqli_close($db);
 
 <script> 
 var phpgrade = <?php echo $jsonDictionary; ?>;
+var firstCourseId = "<?php echo $firstCourseId; ?>";
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    if (firstCourseId !== '') {
+        CallAll(firstCourseId);
+        
+        console.log(firstCourseId);
+    }
+});
+
 function PieChart(course) {
     var chartData = phpgrade[course];
     var gradedata = [];
@@ -263,12 +311,12 @@ function PieChart(course) {
 }
 
 
-$(document).ready(function() {
-    PieChart("COM3101");
-    $('#course').change(function() {
-        PieChart(this.value);
-    });
-});
+// $(document).ready(function() {
+//     PieChart("COM3101");
+//     $('#course').change(function() {
+//         PieChart(this.value);
+//     });
+// });
 
 
 
@@ -276,9 +324,10 @@ $(document).ready(function() {
 function postfeedback() {
   
     var feedback = document.getElementById("feedback").value;
-        
+    var courseid = document.getElementById("courseSpan").innerHTML;
+ 
             
-
+    if(courseid!=''){
     $.ajax({
         type: 'POST',
         url: 'grade.php',
@@ -288,7 +337,7 @@ function postfeedback() {
 
     },
         success: function(response) {
-        feedback.value ="";
+        document.getElementById("feedback").value = '';
 
         var feedbackData = {
             courseid:courseid,
@@ -312,16 +361,17 @@ function postfeedback() {
         }
         });
     }
-
+    else{
+        alert("You don't have a course");
+    }
+    }
+   
 
 
 
 // 数据
 var data=[];
 
-$(document).ready(function() {
-    showfeedback('COM3101');
-});
 function showfeedback(courseId) {
     data = <?php echo json_encode($courselist); ?>[courseId];
     console.log(data);
@@ -338,13 +388,13 @@ function showfeedback(courseId) {
 }
 
 
-var color = d3.scale.category20();  // 输出20种类别的颜色 ---颜色比例尺
+var color = d3.scale.category20();  
 
 var containerWidth = document.getElementById("cloud").offsetWidth; 
 var containerHeight = document.getElementById("cloud").offsetHeight;
 
 function draw(words) {
-    d3.select("#cloud").select("svg").remove(); // 移除之前的 SVG，以免重叠
+    d3.select("#cloud").select("svg").remove(); 
 
     d3.select("#cloud").append("svg")
         .attr("width", '100%')
@@ -366,12 +416,17 @@ function draw(words) {
 
 
 function CallAll(courseid) {
-   
-
+    var courseSpan = document.getElementById("courseSpan");
+    if (courseSpan) {
+        courseSpan.innerHTML = courseid;
+    }
+  
     showfeedback(courseid);
     PieChart(courseid);
     showCourse(courseid);
+
 }
+
 
 
 
@@ -386,12 +441,9 @@ function hideAllCourses() {
         div.style.display = 'none';
     });
     }
-    hideAllCourses();
 
-var firstCourse = document.getElementById('COM3101');
-    if (firstCourse) {
-        firstCourse.style.display = 'flex';
-    }
+
+
 
 function showCourse(courseid) {
     hideAllCourses();

@@ -186,9 +186,9 @@ fetch(xmlFile)
   });
 
 function renderData(name, id, time) {
-//   console.log(`Name: ${name}`);
-//   console.log(`ID: ${id}`);
-//   console.log(`Last Login Time: ${time}`);
+  // console.log(`Name: ${name}`);
+  // console.log(`ID: ${id}`);
+  // console.log(`Last Login Time: ${time}`);
 // }
   const container = document.createElement('div');
   container.classList.add('list');

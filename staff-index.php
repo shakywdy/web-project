@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-09-26 23:45:57
- * @LastEditTime: 2023-11-09 21:21:19
+ * @LastEditTime: 2023-11-09 21:25:39
  * @FilePath: /web-project/staff-index.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -150,7 +150,7 @@ if (isset($_SESSION['user_id'])) {
      </div>
      <div class="left-content">
      <button class="left-content-list active" onclick="changeFrame('staff-index/staff-course.php')">Home</button>
-     <button class="left-content-list" onclick="changeFrame('staff-index/staff-read.php')">Friend</button>
+     <button class="left-content-list" onclick="changeFrame('staff-index/staff-read.php')">Students</button>
      </div>
     </div> 
     </div>

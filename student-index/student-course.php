@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-04 02:28:48
+ * @LastEditTime: 2023-11-09 22:49:51
  * @FilePath: /web-project/student-index/student-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -25,7 +25,7 @@ if (isset($_SESSION['user_id'])) {
     }
     $coursebutton = '';
     $counter = 0;
-
+    $coursecontent ='';
     while ($row = mysqli_fetch_assoc($result)) {
         $counter++;
         $courseid=$row['courseid'];
