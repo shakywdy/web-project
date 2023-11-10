@@ -53,9 +53,9 @@ if (mysqli_num_rows($result) > 0) {
         }
     }
 
-   
+    $jsonDictionary = json_encode($dictionary);
 } 
-$jsonDictionary = json_encode($dictionary);
+
 
 
 

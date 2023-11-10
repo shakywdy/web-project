@@ -35,6 +35,7 @@
   .left-content{
     display: flex;
     width: 100%;
+    height: 100%;
     flex-direction: column;
     align-items: center;
   }
@@ -295,3 +296,17 @@
  .dropdown-item{
   font-size: 20px;
  }
+.exit{
+  border:none;
+  background-color: #00351200;
+  margin-top: auto;
+  margin-bottom: 98%;
+  color: #484747eb;
+  transition: all ease 0.3s;
+  width: 100%;
+  height: 10%;
+
+}
+.exit:hover{
+  background-color:rgba(136, 136, 136, 0.554);
+}

@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-09 22:47:01
+ * @LastEditTime: 2023-11-10 16:49:15
  * @FilePath: /web-project/staff-index/staff-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -193,7 +193,7 @@ if (isset($_SESSION['user_id'])) {
               $homeworkbt='<button class="score-button"><div class="score-bt-top"><span>'.$has.'</span> assignments have been received</div><div class="score-bt-bt">Not received yet.</div></button>';
             }
 
-            
+            $coursecontent='';
             $link='';
             $filelink ="SELECT* FROM worklink WHERE courseid ='$crcourseid'AND header='$crid'";
             $filelinkresult = mysqli_query($db, $filelink);

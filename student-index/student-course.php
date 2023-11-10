@@ -2,7 +2,7 @@
 /*
  * @Author: shaky
  * @Date: 2023-10-24 00:08:47
- * @LastEditTime: 2023-11-09 22:49:51
+ * @LastEditTime: 2023-11-10 15:22:01
  * @FilePath: /web-project/student-index/student-course.php
  * Intimat: jason
  * Copyright (c) 2023 by shakywdy@gmail.com All Rights Reserved. 
@@ -244,7 +244,6 @@ if (isset($_SESSION['user_id'])) {
        $stresule = mysqli_query($db, $studentdue);
        while ($row = mysqli_fetch_assoc($stresule)) {
         $dueDates[] = $row;
-
        }
       //  search course due date 
        $sqlcourse = "SELECT courseid FROM course WHERE studentid = $userid";
